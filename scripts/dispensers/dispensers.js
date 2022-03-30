@@ -45,7 +45,7 @@ const WALLET_IDS = [
 				const soldDispensers = JSON.parse(fileData).filter((data) => {
 					// Find dispenser based on current index 
 					const indexedDispenser = flattendDispenserArray.find((dispenser) => dispenser.source === data.source);
-					return indexedDispenser.give_remaining !== data.give_remaining;
+					return !!indexedDispenser && indexedDispenser.give_remaining !== data.give_remaining;
 				});
 
 				if (soldDispensers.length) {
