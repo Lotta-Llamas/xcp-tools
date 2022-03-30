@@ -6,13 +6,17 @@
 	"author": "Eats Alone",
 	"license": "MIT",
 	"devDependencies": {
-	  "eslint": "^8.11.0"
+		"eslint": "^8.11.0"
 	},
 	"scripts": {
-	  "lint": "npx eslint -c ./eslintrc.json .",
-	  "balance": "yarn run lint && node scripts/dispensers/dispensers.js"
+		"lint": "npx eslint -c ./eslintrc.json .",
+		"balance": "yarn run lint && node scripts/dispensers/dispensers.js",
+		"test": "mocha"
 	},
 	"repository": "https://github.com/eats-alone/xcp-tools.git",
-	"private": true
-  }
-  
+	"private": true,
+	"dependencies": {
+		"chai": "^4.3.6",
+		"mocha": "^9.2.2"
+	}
+}
