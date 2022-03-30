@@ -1,45 +1,11 @@
-const https = require('https');
 const fs = require('fs');
 const { getWallets } = require('../config/wallet-ids.js');
-const { hasAvailableDispensers } = require('./utils.js');
+const { hasAvailableDispensers, getWalletData } = require('./utils.js');
 
 // Place dispeners ids in here or in the wallet-ids.js file
 const WALLET_IDS = [
 
 ];
-
-function getWalletData(walletId) {
-	const options = {
-		hostname: 'xchain.io',
-		path: `/api/dispensers/${walletId}`,
-		method: 'GET'
-	}
-	return new Promise((resolve, reject) => {
-		// Using native node module, but will consider different libs after abstraction
-		const req = https.get(options, res => {
-			let dispensers = '';
-			
-			// called when a data chunk is received.
-			res.on('data', (chunk) => {
-				dispensers += chunk;
-			});
-	
-			res.on('end', () => {	
-				const wallet = JSON.parse(dispensers);
-				// Append wallet id to response
-				wallet.id = walletId;
-				resolve(wallet);
-			});
-		});
-
-		req.on('error', error => {
-			console.log(error);
-			reject(error);
-		});
-	
-		req.end();
-	})
-}
 
 // Using IIFE for now, but will probably refactor into a more portable api
 (async () => {

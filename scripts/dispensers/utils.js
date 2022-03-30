@@ -1,3 +1,5 @@
+const https = require('https');
+
 exports.hasAvailableDispensers = (dispensers) => {
 	try {
 		if (!dispensers || !dispensers.data || dispensers.data.length === 0) {
@@ -19,4 +21,40 @@ exports.hasAvailableDispensers = (dispensers) => {
 		console.log(`Error: ${e}`);
 		return false;
 	}
+}
+
+exports.getWalletData = (walletId) => {
+	if (!walletId || typeof walletId !== 'string' ) {
+		return Error('Wallet ID is not a string')
+	}
+	const options = {
+		hostname: 'xchain.io',
+		path: `/api/dispensers/${walletId}`,
+		method: 'GET'
+	}
+	return new Promise((resolve, reject) => {
+		// Using native node module, but will consider different libs after abstraction
+		const req = https.get(options, res => {
+			let dispensers = '';
+			
+			// called when a data chunk is received.
+			res.on('data', (chunk) => {
+				dispensers += chunk;
+			});
+	
+			res.on('end', () => {	
+				const wallet = JSON.parse(dispensers);
+				// Append wallet id to response
+				wallet.id = walletId;
+				resolve(wallet);
+			});
+		});
+
+		req.on('error', error => {
+			console.log(error);
+			reject(error);
+		});
+	
+		req.end();
+	})
 }
