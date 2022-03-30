@@ -67,7 +67,7 @@
         "use-isnan": 2,
         "valid-typeof": 2,
         "arrow-spacing": 2,
-        "comma-dangle": 2,
+        "comma-dangle": 0,
         "comma-spacing": 2
     },
     "env": {

@@ -1,49 +1,23 @@
-const https = require('https');
 const fs = require('fs');
-const { getWallets } = require('../config/wallet-ids.js');
+let walletIds = require('../config/wallet-ids.json').walletIds;
+const { hasAvailableDispensers, getWalletData } = require('./utils.js');
 
-// Place dispeners ids in here or in the wallet-ids.js file
+// Place dispeners ids in here or in the config/wallet-ids.json file
 const WALLET_IDS = [
 
 ];
 
-function getWalletData(walletId) {
-	const options = {
-		hostname: 'xchain.io',
-		path: `/api/dispensers/${walletId}`,
-		method: 'GET'
-	}
-	return new Promise((resolve, reject) => {
-		// Using native node module, but will consider different libs after abstraction
-		const req = https.get(options, res => {
-			let dispensers = '';
-			
-			// called when a data chunk is received.
-			res.on('data', (chunk) => {
-				dispensers += chunk;
-			});
-	
-			res.on('end', () => {	
-				const wallet = JSON.parse(dispensers);
-				// Append wallet id to response
-				wallet.id = walletId;
-				resolve(wallet);
-			});
-		});
-
-		req.on('error', error => {
-			console.log(error);
-			reject(error);
-		});
-	
-		req.end();
-	})
-}
 // Using IIFE for now, but will probably refactor into a more portable api
 (async () => {
 	// Check to see if wallet ids are in seperate file, if not then
 	// check the in file array (WALLET_IDS)
-	const walletIds = getWallets().length ? getWallets() : WALLET_IDS;
+	walletIds = walletIds.length ? walletIds : WALLET_IDS;
+
+	if (walletIds.length === 0) {
+		console.log('Please add some wallet IDs to the config/wallet-ids.json config file');
+		return
+	}
+
 	const walletPromises = await walletIds.map((wallet) => {
 		return getWalletData(wallet);
 	});
@@ -52,14 +26,7 @@ function getWalletData(walletId) {
 		const flattendDispenserArray = [];
 		// Iterate over each wallet
 		wallets.forEach((wallet) => {
-			// Filter to get all closed dispensers
-			const closedDispensers = wallet.data.filter((dispenser) => { 
-				return dispenser.status === '10' 
-			});
-
-			// If there are any wallets that are all closed dispensers or that are new
-			// then log out those wallet ids.  
-			if (closedDispensers.length === wallet.data.length || wallet.data.length === 0) {
+			if(hasAvailableDispensers(wallet)) {
 				console.log(`Available Wallets: ${wallet.id}`);
 			}
 			
@@ -78,7 +45,7 @@ function getWalletData(walletId) {
 				const soldDispensers = JSON.parse(fileData).filter((data) => {
 					// Find dispenser based on current index 
 					const indexedDispenser = flattendDispenserArray.find((dispenser) => dispenser.source === data.source);
-					return indexedDispenser.give_remaining !== data.give_remaining;
+					return !!indexedDispenser && indexedDispenser.give_remaining !== data.give_remaining;
 				});
 
 				if (soldDispensers.length) {
