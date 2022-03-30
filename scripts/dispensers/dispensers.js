@@ -1,8 +1,8 @@
 const fs = require('fs');
-const { getWallets } = require('../config/wallet-ids.js');
+let walletIds = require('../config/wallet-ids.json').walletIds;
 const { hasAvailableDispensers, getWalletData } = require('./utils.js');
 
-// Place dispeners ids in here or in the wallet-ids.js file
+// Place dispeners ids in here or in the config/wallet-ids.json file
 const WALLET_IDS = [
 
 ];
@@ -11,7 +11,13 @@ const WALLET_IDS = [
 (async () => {
 	// Check to see if wallet ids are in seperate file, if not then
 	// check the in file array (WALLET_IDS)
-	const walletIds = getWallets().length ? getWallets() : WALLET_IDS;
+	walletIds = walletIds.length ? walletIds : WALLET_IDS;
+
+	if (walletIds.length === 0) {
+		console.log('Please add some wallet IDs to the config/wallet-ids.json config file');
+		return
+	}
+
 	const walletPromises = await walletIds.map((wallet) => {
 		return getWalletData(wallet);
 	});
