@@ -1,6 +1,7 @@
 const https = require('https');
 const fs = require('fs');
 const { getWallets } = require('../config/wallet-ids.js');
+const { hasAvailableDispensers } = require('./utils.js');
 
 // Place dispeners ids in here or in the wallet-ids.js file
 const WALLET_IDS = [
@@ -39,6 +40,7 @@ function getWalletData(walletId) {
 		req.end();
 	})
 }
+
 // Using IIFE for now, but will probably refactor into a more portable api
 (async () => {
 	// Check to see if wallet ids are in seperate file, if not then
@@ -52,14 +54,7 @@ function getWalletData(walletId) {
 		const flattendDispenserArray = [];
 		// Iterate over each wallet
 		wallets.forEach((wallet) => {
-			// Filter to get all closed dispensers
-			const closedDispensers = wallet.data.filter((dispenser) => { 
-				return dispenser.status === '10' 
-			});
-
-			// If there are any wallets that are all closed dispensers or that are new
-			// then log out those wallet ids.  
-			if (closedDispensers.length === wallet.data.length || wallet.data.length === 0) {
+			if(hasAvailableDispensers(wallet)) {
 				console.log(`Available Wallets: ${wallet.id}`);
 			}
 			
