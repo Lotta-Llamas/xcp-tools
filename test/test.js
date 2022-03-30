@@ -1,6 +1,24 @@
 const assert = require('assert');
+const nock = require('nock');
 const { describe, it } = require("mocha");
-const { hasAvailableDispensers } = require('../scripts/dispensers/utils.js');
+
+// Mock xchain.io/api/dispensers/{walletId} response
+nock('https://xchain.io')
+	.persist()
+	.get('/api/dispensers/1')
+	.reply(200, {
+		id: 1,
+		total: 1,
+		data: [
+			{
+				"asset":"SMOLDONNA",
+				"escrow_quantity":"4",
+				"give_quantity":"1",
+				"give_remaining":"0",
+				"status":"10",
+			}
+		]
+	})
 
 // If a wallet has a status of 10 and have 0 gives_remaining
 // its considered availabe
