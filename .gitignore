@@ -1,0 +1,4 @@
+/node_modules
+
+scripts/config/wallet-ids.js
+scripts/data/data.json

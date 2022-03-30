@@ -1,0 +1,18 @@
+{
+	"name": "xcp-tools",
+	"version": "1.0.0",
+	"description": "Tools for XCP Blockchain",
+	"main": "index.js",
+	"author": "Eats Alone",
+	"license": "MIT",
+	"devDependencies": {
+	  "eslint": "^8.11.0"
+	},
+	"scripts": {
+	  "lint": "npx eslint -c ./eslintrc.json .",
+	  "balance": "yarn run lint && node scripts/dispensers/dispensers.js"
+	},
+	"repository": "https://github.com/eats-alone/xcp-tools.git",
+	"private": true
+  }
+  
